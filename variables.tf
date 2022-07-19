@@ -103,13 +103,6 @@ variable "cloudfront_minimum_protocol_version" {
   type        = string
   default     = "TLSv1"
 }
-
-variable "cloudfront_origin_request_policy" {
-  description = "Id of a custom request policy that overrides the default policy (AllViewer). Can be custom or managed."
-  type        = string
-  default     = null
-}
-
 variable "cloudfront_response_headers_policy" {
   description = "Id of a response headers policy. Can be custom or managed. Default is empty."
   type        = string
@@ -121,7 +114,26 @@ variable "cloudfront_cache_key_headers" {
   type        = list(string)
   default     = ["Authorization"]
 }
-
+variable "cloudfront_origin_request_policy_name" {
+  description = "Id of a custom request policy that overrides the default policy (AllViewer). Can be custom or managed."
+  type        = string
+  default     = null
+}
+variable "cloudfront_cache_policy_name" {
+  description = "Id of a custom cache policy that overrides creation."
+  type        = string
+  default     = null
+}
+variable "cloudfront_opt_origin_request_policy_name" {
+  type        = string
+  description = "Name of Origin request to apply for Image Optmizer CF"
+  default     = null
+}
+variable "cloudfront_opt_cache_policy_name" {
+  type        = string
+  description = "Name of Cache policy to apply for Image Optmizer CF"
+  default     = null
+}
 variable "cloudfront_external_id" {
   description = "When using an external CloudFront distribution provide its id."
   type        = string

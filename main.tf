@@ -307,6 +307,9 @@ module "next_image" {
   lambda_policy_json               = data.aws_iam_policy_document.access_static_deployment.json
   lambda_role_permissions_boundary = var.lambda_role_permissions_boundary
 
+  cloudfront_cache_policy_name          = var.cloudfront_opt_cache_policy_name
+  cloudfront_origin_request_policy_name = var.cloudfront_opt_origin_request_policy_name
+
   deployment_name = "${var.deployment_name}_tfn-image"
   tags            = var.tags
 }
@@ -371,7 +374,10 @@ module "proxy" {
 data "aws_cloudfront_origin_request_policy" "managed_all_viewer" {
   name = "Managed-AllViewer"
 }
-
+data "aws_cloudfront_origin_request_policy" "this" {
+  count = var.cloudfront_origin_request_policy_name != null ? 1 : 0
+  name = var.cloudfront_origin_request_policy_name
+}
 locals {
   # Default headers on which the cache key should be determined
   #
@@ -384,7 +390,15 @@ locals {
   ))
 }
 
+#If Cache Policy Name has been given, get info 
+data "aws_cloudfront_cache_policy" "this_cache" {
+  count = var.cloudfront_cache_policy_name != null ? 1 : 0
+  name  = var.cloudfront_cache_policy_name
+}
+
+# If no cache policy name is given, defaults to null and create resource
 resource "aws_cloudfront_cache_policy" "this" {
+  count   = var.cloudfront_cache_policy_name == null ? 1 : 0
   name    = "${var.deployment_name}_tfn-cache"
   comment = "Managed by Terraform Next.js"
 
@@ -471,9 +485,9 @@ locals {
       compress               = true
       viewer_protocol_policy = "redirect-to-https"
 
-      origin_request_policy_id   = var.cloudfront_origin_request_policy != null ? var.cloudfront_origin_request_policy : data.aws_cloudfront_origin_request_policy.managed_all_viewer.id
+      origin_request_policy_id   = var.cloudfront_origin_request_policy != null ? data.aws_cloudfront_origin_request_policy.this[0].id : data.aws_cloudfront_origin_request_policy.managed_all_viewer.id
       response_headers_policy_id = var.cloudfront_response_headers_policy
-      cache_policy_id            = aws_cloudfront_cache_policy.this.id
+      cache_policy_id            = var.cloudfront_cache_policy_name != null ? data.aws_cloudfront_cache_policy.this_cache[0].id : aws_cloudfront_cache_policy.this[0].id
 
       lambda_function_association = {
         event_type   = "origin-request"
