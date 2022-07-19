@@ -485,7 +485,7 @@ locals {
       compress               = true
       viewer_protocol_policy = "redirect-to-https"
 
-      origin_request_policy_id   = var.cloudfront_origin_request_policy != null ? data.aws_cloudfront_origin_request_policy.this[0].id : data.aws_cloudfront_origin_request_policy.managed_all_viewer.id
+      origin_request_policy_id   = var.cloudfront_origin_request_policy_name != null ? data.aws_cloudfront_origin_request_policy.this[0].id : data.aws_cloudfront_origin_request_policy.managed_all_viewer.id
       response_headers_policy_id = var.cloudfront_response_headers_policy
       cache_policy_id            = var.cloudfront_cache_policy_name != null ? data.aws_cloudfront_cache_policy.this_cache[0].id : aws_cloudfront_cache_policy.this[0].id
 
