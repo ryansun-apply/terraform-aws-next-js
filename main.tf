@@ -284,7 +284,7 @@ module "next_image" {
   count = var.create_image_optimization ? 1 : 0
 
   source  = "ryansun-apply/next-js-image-optimization/aws"
-  version = "12.1.2"
+  version = "13.0.0"
 
   cloudfront_create_distribution = false
 
